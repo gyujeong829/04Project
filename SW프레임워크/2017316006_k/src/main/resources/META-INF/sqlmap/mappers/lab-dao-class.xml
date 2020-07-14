@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Shopping">
+	
+    <resultMap type="shopVO" id="shopResult">
+        <id property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="price" column="price" />
+		<result property="color" column="color" />
+		<result property="quantity" column="quantity" />
+    </resultMap>
+    
+    <insert id="insertShop" parameterType="shopVO">
+        insert into shopping
+        	(id, name, price, color, quantity)
+        values
+        	(#{id} , #{name} , #{price}, #{color}, #{quantity})
+    </insert>
+   
+    <update id="updateShop" parameterType="shopVO">
+        update shopping       
+        <trim prefix="SET" suffixOverrides=", " >
+        	<if test="name !=null">
+        	name = #{name},
+        	</if>
+        	<if test="price !=null">
+        	price = #{price},
+        	</if>
+        	<if test="color !=null">
+        	color = #{color},
+        	</if>
+        	<if test="quantity !=null">
+        	quantity = #{quantity},
+        	</if>
+        </trim>
+        where
+        	id = #{id}
+    </update>
+    
+    <delete id="deleteShop" parameterType="shopVO">
+        delete from shopping
+        where 1=1
+        	<if test="id != null">
+        	and id = #{id}
+        	</if>        
+    </delete>
+    
+    <select id="selectShop" parameterType="shopVO" resultMap="shopResult">
+        select id, name, price, color, quantity
+        from shopping
+        where id = #{id}
+    </select>
+    
+    <select id="selectShopList" parameterType="shopVO" resultMap="shopResult">
+        select id, name, price, color, quantity
+        from shopping
+        where 1=1
+        <if test="id != null">
+        and id = #{id}
+        </if>
+        <if test="name != null">
+        and name like concat('%', #{name}, '%')
+        </if>
+        <if test="price != null">
+        and price like concat('%', #{price}, '%')
+        </if>
+        <if test="color != null">
+        and color like concat('%', #{color}, '%')
+        </if>
+        <if test="quantity != null">
+        and quantity like concat('%', #{quantity}, '%')
+        </if>
+    </select>   
+         
+     <select id="selectShoppingList" parameterType="java.util.Map"  resultMap="shopResult"> 
+     <![CDATA[
+     	select id, name 
+     	from shopping
+     ]]>
+     	<where> 
+     		<if test="searchName != null and searchName != ''"> 
+     			name like '%${searchName}%' 
+     		</if>
+     	</where>
+     <![CDATA[ 
+     	 order by CONVERT(id,SIGNED) 
+     	 limit #{firstIndex}, #{recordCountPerPage}
+     ]]>
+     </select>
+      
+      <select id="getShoppingCount" parameterType="java.util.Map"  resultType="int"> 
+      <![CDATA[  
+      	select count(*) id 
+      	from shopping
+      ]]> 
+      <where> 
+      <if test="searchName != null and searchName != ''"> 
+      name like '%${searchName}%' 
+      </if>
+      </where>
+     </select>
+</mapper>
+
